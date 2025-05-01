@@ -24,6 +24,7 @@ export default function AdvancedTextEditor() {
   const [searchTerm, setSearchTerm] = useState('');
   const [replaceTerm, setReplaceTerm] = useState('');
   const [useRegex, setUseRegex] = useState(false);
+  const [caseInsensitive, setCaseInsensitive] = useState(true);
   const [showSearchDialog, setShowSearchDialog] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [selectedRemoveOption, setSelectedRemoveOption] = useState('');
@@ -169,9 +170,18 @@ export default function AdvancedTextEditor() {
     
     try {
       const content = editor.getHTML();
-      const searchRegex = useRegex 
-        ? new RegExp(searchTerm, 'g') 
-        : new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      let searchRegex;
+      
+      if (useRegex) {
+        // Create regex with or without case sensitivity
+        searchRegex = new RegExp(searchTerm, caseInsensitive ? 'gi' : 'g');
+      } else {
+        // For plain text search, escape special regex characters and set flags
+        searchRegex = new RegExp(
+          searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 
+          caseInsensitive ? 'gi' : 'g'
+        );
+      }
       
       const newContent = content.replace(searchRegex, replaceTerm);
       editor.commands.setContent(newContent);
@@ -444,26 +454,26 @@ export default function AdvancedTextEditor() {
   return (
     <div className="p-4">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded border mb-4 shadow-sm">
+      <div className="flex flex-wrap gap-2 p-2 bg-[#F9FAFB] rounded border border-[#E2E8F0] mb-4 shadow-sm">
         {/* Text format buttons */}
         <div className="flex gap-1 border-r pr-2">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive('bold') ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive('bold') ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Bold"
           >
             <Bold size={18} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive('italic') ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive('italic') ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Italic"
           >
             <Italic size={18} />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive('underline') ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive('underline') ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Underline"
           >
             <UnderlineIcon size={18} />
@@ -474,28 +484,28 @@ export default function AdvancedTextEditor() {
         <div className="flex gap-1 border-r pr-2">
           <button
             onClick={() => editor.chain().focus().setTextAlign('left').run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive({ textAlign: 'left' }) ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive({ textAlign: 'left' }) ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Align Left"
           >
             <AlignLeft size={18} />
           </button>
           <button
             onClick={() => editor.chain().focus().setTextAlign('center').run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive({ textAlign: 'center' }) ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive({ textAlign: 'center' }) ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Center"
           >
             <AlignCenter size={18} />
           </button>
           <button
             onClick={() => editor.chain().focus().setTextAlign('right').run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive({ textAlign: 'right' }) ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive({ textAlign: 'right' }) ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Align Right"
           >
             <AlignRight size={18} />
           </button>
           <button
             onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${editor.isActive({ textAlign: 'justify' }) ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${editor.isActive({ textAlign: 'justify' }) ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Justify"
           >
             <AlignJustify size={18} />
@@ -507,7 +517,7 @@ export default function AdvancedTextEditor() {
           <button
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${!editor.can().undo() ? 'opacity-50 bg-gray-100' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${!editor.can().undo() ? 'opacity-50 bg-gray-100' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Undo"
           >
             <Undo size={18} />
@@ -515,7 +525,7 @@ export default function AdvancedTextEditor() {
           <button
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${!editor.can().redo() ? 'opacity-50 bg-gray-100' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${!editor.can().redo() ? 'opacity-50 bg-gray-100' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Redo"
           >
             <Redo size={18} />
@@ -564,7 +574,7 @@ export default function AdvancedTextEditor() {
         <div className="flex gap-1">
           <button
             onClick={() => setShowAdvancedTools(!showAdvancedTools)}
-            className={`p-2 rounded hover:bg-indigo-100 transition-colors ${showAdvancedTools ? 'bg-indigo-200 text-indigo-800' : 'text-gray-800 bg-white shadow-sm border'}`}
+            className={`p-2 rounded hover:bg-[#FFB285] transition-colors ${showAdvancedTools ? 'bg-[#FF8C42] text-white' : 'text-gray-800 bg-white shadow-sm border'}`}
             title="Advanced Tools"
           >
             <Settings size={18} />
@@ -573,7 +583,7 @@ export default function AdvancedTextEditor() {
           
           <button
             onClick={copyToClipboard}
-            className="p-2 rounded text-gray-800 bg-white shadow-sm border hover:bg-indigo-100 transition-colors flex items-center gap-1"
+            className="p-2 rounded text-gray-800 bg-white shadow-sm border hover:bg-[#FFB285] transition-colors flex items-center gap-1"
             title="Copy All Text"
           >
             {copySuccess ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
@@ -584,17 +594,17 @@ export default function AdvancedTextEditor() {
 
       {/* Advanced Tools Panel - Visible when showAdvancedTools is true */}
       {showAdvancedTools && (
-        <div className="bg-gray-100 border rounded p-3 mb-4 shadow-sm">
-          <h3 className="text-lg font-medium text-gray-800 mb-3">Advanced Tools</h3>
+        <div className="bg-[#F9FAFB] border border-[#E2E8F0] rounded p-3 mb-4 shadow-sm">
+          <h3 className="text-lg font-medium text-[#2D3748] mb-3">Advanced Tools</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* First Column */}
             <div className="flex flex-col gap-3">
               {/* Search and Replace */}
-              <div className="bg-white p-3 rounded border shadow-sm">
-                <div className="flex items-center gap-1 mb-2 text-gray-800 font-medium">
+              <div className="bg-white p-3 rounded border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center gap-1 mb-2 text-[#2D3748] font-medium">
                   <Search size={16} />
-                  <h4 className="text-gray-800">Search and Replace</h4>
+                  <h4 className="text-[#2D3748]">Search and Replace</h4>
                 </div>
                 <button 
                   onClick={() => {
@@ -603,7 +613,7 @@ export default function AdvancedTextEditor() {
                       if (searchInputRef.current) searchInputRef.current.focus();
                     }, 100);
                   }}
-                  className="w-full p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                  className="w-full p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                 >
                   <ScanSearch size={16} />
                   <span>Search and Replace</span>
@@ -611,14 +621,14 @@ export default function AdvancedTextEditor() {
               </div>
               
               {/* Text Statistics */}
-              <div className="bg-white p-3 rounded border shadow-sm">
-                <div className="flex items-center gap-1 mb-2 text-gray-800 font-medium">
+              <div className="bg-white p-3 rounded border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center gap-1 mb-2 text-[#2D3748] font-medium">
                   <Book size={16} />
-                  <h4 className="text-gray-800">Text Statistics</h4>
+                  <h4 className="text-[#2D3748]">Text Statistics</h4>
                 </div>
                 <button 
                   onClick={calculateTextStats}
-                  className="w-full p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                  className="w-full p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                 >
                   <Hash size={16} />
                   <span>Word & Character Count</span>
@@ -629,14 +639,14 @@ export default function AdvancedTextEditor() {
             {/* Second Column */}
             <div className="flex flex-col gap-3">
               {/* Selective Removal */}
-              <div className="bg-white p-3 rounded border shadow-sm">
-                <div className="flex items-center gap-1 mb-2 text-gray-800 font-medium">
+              <div className="bg-white p-3 rounded border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center gap-1 mb-2 text-[#2D3748] font-medium">
                   <X size={16} />
-                  <h4 className="text-gray-800">Selective Removal</h4>
+                  <h4 className="text-[#2D3748]">Selective Removal</h4>
                 </div>
                 <button 
                   onClick={() => setShowRemoveDialog(true)}
-                  className="w-full p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                  className="w-full p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                 >
                   <FileX size={16} />
                   <span>Remove Elements</span>
@@ -644,14 +654,14 @@ export default function AdvancedTextEditor() {
               </div>
               
               {/* Capitalization Tools */}
-              <div className="bg-white p-3 rounded border shadow-sm">
-                <div className="flex items-center gap-1 mb-2 text-gray-800 font-medium">
+              <div className="bg-white p-3 rounded border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center gap-1 mb-2 text-[#2D3748] font-medium">
                   <Type size={16} />
-                  <h4 className="text-gray-800">Capitalization</h4>
+                  <h4 className="text-[#2D3748]">Capitalization</h4>
                 </div>
                 <button 
                   onClick={() => setShowCapitalizationDialog(true)}
-                  className="w-full p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                  className="w-full p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                 >
                   <ArrowUpDown size={16} />
                   <span>Change Case</span>
@@ -662,15 +672,15 @@ export default function AdvancedTextEditor() {
             {/* Third Column */}
             <div className="flex flex-col gap-3">
               {/* Cleanup and Conversion */}
-              <div className="bg-white p-3 rounded border shadow-sm">
-                <div className="flex items-center gap-1 mb-2 text-gray-800 font-medium">
+              <div className="bg-white p-3 rounded border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center gap-1 mb-2 text-[#2D3748] font-medium">
                   <RefreshCw size={16} />
-                  <h4 className="text-gray-800">Cleanup and Conversion</h4>
+                  <h4 className="text-[#2D3748]">Cleanup and Conversion</h4>
                 </div>
                 <div className="flex flex-col gap-2">
                   <button 
                     onClick={clearFormatting}
-                    className="w-full p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                    className="w-full p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                   >
                     <FileX size={16} />
                     <span>Clear Formatting</span>
@@ -678,7 +688,7 @@ export default function AdvancedTextEditor() {
                   <div className="flex gap-1">
                     <button 
                       onClick={convertToPlainText}
-                      className="flex-1 p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                      className="flex-1 p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                       title="Convert to Plain Text"
                     >
                       <Terminal size={16} />
@@ -686,7 +696,7 @@ export default function AdvancedTextEditor() {
                     </button>
                     <button 
                       onClick={convertToHTML}
-                      className="flex-1 p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                      className="flex-1 p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                       title="Convert to HTML"
                     >
                       <Hash size={16} />
@@ -696,15 +706,15 @@ export default function AdvancedTextEditor() {
                 </div>
               </div>
               
-              {/* Special Features */}
-              <div className="bg-white p-3 rounded border shadow-sm">
-                <div className="flex items-center gap-1 mb-2 text-gray-800 font-medium">
+              {/* Bionic Reader */}
+              <div className="bg-white p-3 rounded border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center gap-1 mb-2 text-[#2D3748] font-medium">
                   <Eye size={16} />
-                  <h4 className="text-gray-800">Bionic Reader</h4>
+                  <h4 className="text-[#2D3748]">Bionic Reader</h4>
                 </div>
                 <button 
                   onClick={() => setShowBionicReaderDialog(true)}
-                  className="w-full p-2 bg-white border rounded hover:bg-indigo-50 transition-colors text-gray-800 flex items-center justify-center gap-1"
+                  className="w-full p-2 bg-white border rounded hover:bg-[#FFF0E5] transition-colors text-gray-800 flex items-center justify-center gap-1"
                 >
                   <Eye size={16} />
                   <span>Bionic Reader</span>
@@ -718,7 +728,7 @@ export default function AdvancedTextEditor() {
       {/* Editor Content */}
       <div 
         ref={editorContainerRef}
-        className="border rounded min-h-[50vh] bg-white shadow-sm relative cursor-text"
+        className="border border-[#E2E8F0] rounded min-h-[50vh] bg-white shadow-sm relative cursor-text"
       >
         <EditorContent editor={editor} className="p-4 min-h-[50vh] text-gray-900" />
       </div>
@@ -733,39 +743,39 @@ export default function AdvancedTextEditor() {
       {/* Search and Replace Dialog */}
       {showSearchDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-lg">
+          <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-                <Search size={20} />
+              <h3 className="text-xl font-bold flex items-center gap-2 text-[#2D3748]">
+                <Search size={20} className="text-[#FF8C42]" />
                 Search and Replace
               </h3>
               <button 
                 onClick={handleCloseSearchDialog}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-[#FF8C42]"
               >
                 ✕
               </button>
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-800 mb-1">Search:</label>
+              <label className="block text-[#2D3748] mb-1">Search:</label>
               <input 
                 type="text" 
                 ref={searchInputRef}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-900"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#FF8C42] text-gray-900"
                 placeholder="Text to search..."
               />
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-800 mb-1">Replace with:</label>
+              <label className="block text-[#2D3748] mb-1">Replace with:</label>
               <input 
                 type="text" 
                 value={replaceTerm}
                 onChange={(e) => setReplaceTerm(e.target.value)}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-900"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#FF8C42] text-gray-900"
                 placeholder="Replacement text..."
               />
             </div>
@@ -776,16 +786,28 @@ export default function AdvancedTextEditor() {
                   type="checkbox" 
                   checked={useRegex}
                   onChange={() => setUseRegex(!useRegex)}
-                  className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="w-4 h-4 text-[#FF8C42] focus:ring-[#FF8C42] border-gray-300 rounded"
                 />
-                <span className="ml-2 text-gray-800">Use regular expressions</span>
+                <span className="ml-2 text-[#2D3748]">Use regular expressions</span>
+              </label>
+            </div>
+            
+            <div className="mb-4">
+              <label className="flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={caseInsensitive}
+                  onChange={() => setCaseInsensitive(!caseInsensitive)}
+                  className="w-4 h-4 text-[#FF8C42] focus:ring-[#FF8C42] border-gray-300 rounded"
+                />
+                <span className="ml-2 text-[#2D3748]">Case insensitive (ignore uppercase/lowercase)</span>
               </label>
             </div>
             
             <div className="flex justify-end">
               <button
                 onClick={handleReplace}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-1"
+                className="px-4 py-2 bg-[#3B82F6] text-white rounded hover:bg-[#2563EB] transition-colors flex items-center gap-1"
               >
                 <Replace size={16} />
                 <span>Replace</span>
@@ -798,15 +820,15 @@ export default function AdvancedTextEditor() {
       {/* Capitalization Dialog */}
       {showCapitalizationDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-                <Type size={20} />
+              <h3 className="text-xl font-bold flex items-center gap-2 text-[#2D3748]">
+                <Type size={20} className="text-[#FF8C42]" />
                 Change Text Case
               </h3>
               <button 
                 onClick={handleCloseCapitalizationDialog}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-[#FF8C42]"
               >
                 ✕
               </button>
@@ -815,40 +837,40 @@ export default function AdvancedTextEditor() {
             <div className="grid grid-cols-1 gap-3">
               <button 
                 onClick={() => applyCapitalization('uppercase')}
-                className="p-3 border rounded hover:bg-indigo-50 transition-colors text-left flex items-center"
+                className="p-3 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5] transition-colors text-left flex items-center"
               >
                 <div className="ml-2">
-                  <div className="font-medium text-gray-800">UPPERCASE</div>
+                  <div className="font-medium text-[#2D3748]">UPPERCASE</div>
                   <div className="text-sm text-gray-600">Convert all text to uppercase</div>
                 </div>
               </button>
               
               <button 
                 onClick={() => applyCapitalization('lowercase')}
-                className="p-3 border rounded hover:bg-indigo-50 transition-colors text-left flex items-center"
+                className="p-3 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5] transition-colors text-left flex items-center"
               >
                 <div className="ml-2">
-                  <div className="font-medium text-gray-800">lowercase</div>
+                  <div className="font-medium text-[#2D3748]">lowercase</div>
                   <div className="text-sm text-gray-600">Convert all text to lowercase</div>
                 </div>
               </button>
               
               <button 
                 onClick={() => applyCapitalization('titlecase')}
-                className="p-3 border rounded hover:bg-indigo-50 transition-colors text-left flex items-center"
+                className="p-3 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5] transition-colors text-left flex items-center"
               >
                 <div className="ml-2">
-                  <div className="font-medium text-gray-800">Title Case</div>
+                  <div className="font-medium text-[#2D3748]">Title Case</div>
                   <div className="text-sm text-gray-600">Capitalize the first letter of each word</div>
                 </div>
               </button>
               
               <button 
                 onClick={() => applyCapitalization('sentencecase')}
-                className="p-3 border rounded hover:bg-indigo-50 transition-colors text-left flex items-center"
+                className="p-3 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5] transition-colors text-left flex items-center"
               >
                 <div className="ml-2">
-                  <div className="font-medium text-gray-800">Sentence case</div>
+                  <div className="font-medium text-[#2D3748]">Sentence case</div>
                   <div className="text-sm text-gray-600">Capitalize the first letter of each sentence</div>
                 </div>
               </button>
@@ -860,15 +882,15 @@ export default function AdvancedTextEditor() {
       {/* Bionic Reader Dialog */}
       {showBionicReaderDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-                <Eye size={20} />
+              <h3 className="text-xl font-bold flex items-center gap-2 text-[#2D3748]">
+                <Eye size={20} className="text-[#FF8C42]" />
                 Bionic Reader
               </h3>
               <button 
                 onClick={handleCloseBionicReaderDialog}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-[#FF8C42]"
               >
                 ✕
               </button>
@@ -880,8 +902,8 @@ export default function AdvancedTextEditor() {
                 This feature will bold the first two letters of each word that has three or more letters.
               </p>
               
-              <div className="p-4 bg-gray-50 rounded border mb-4">
-                <p className="text-gray-800">
+              <div className="p-4 bg-[#F9FAFB] rounded border border-[#E2E8F0] mb-4">
+                <p className="text-[#2D3748]">
                   <span className="font-bold">Ex</span>ample of <span className="font-bold">bi</span>onic <span className="font-bold">re</span>ading <span className="font-bold">ap</span>plied to <span className="font-bold">te</span>xt. It <span className="font-bold">on</span>ly <span className="font-bold">bo</span>lds <span className="font-bold">th</span>e <span className="font-bold">fi</span>rst <span className="font-bold">tw</span>o <span className="font-bold">le</span>tters.
                 </p>
               </div>
@@ -890,7 +912,7 @@ export default function AdvancedTextEditor() {
             <div className="flex justify-end">
               <button
                 onClick={applyBionicReader}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-1"
+                className="px-4 py-2 bg-[#FF8C42] text-white rounded hover:bg-[#E67539] transition-colors flex items-center gap-1"
               >
                 <Eye size={16} />
                 <span>Apply Bionic Reading</span>
@@ -903,39 +925,39 @@ export default function AdvancedTextEditor() {
       {/* Text Statistics Dialog */}
       {showTextStatsDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-                <Book size={20} />
+              <h3 className="text-xl font-bold flex items-center gap-2 text-[#2D3748]">
+                <Book size={20} className="text-[#FF8C42]" />
                 Text Statistics
               </h3>
               <button 
                 onClick={handleCloseTextStatsDialog}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-[#FF8C42]"
               >
                 ✕
               </button>
             </div>
             
             <div className="grid grid-cols-1 gap-4">
-              <div className="bg-gray-50 p-4 rounded border">
+              <div className="bg-[#F9FAFB] p-4 rounded border border-[#E2E8F0]">
                 <div className="text-gray-600 mb-1">Words</div>
-                <div className="text-3xl font-bold text-indigo-600">{textStats.words}</div>
+                <div className="text-3xl font-bold text-[#FF8C42]">{textStats.words}</div>
               </div>
               
-              <div className="bg-gray-50 p-4 rounded border">
+              <div className="bg-[#F9FAFB] p-4 rounded border border-[#E2E8F0]">
                 <div className="text-gray-600 mb-1">Characters (excluding spaces)</div>
-                <div className="text-3xl font-bold text-indigo-600">{textStats.characters}</div>
+                <div className="text-3xl font-bold text-[#FF8C42]">{textStats.characters}</div>
               </div>
               
-              <div className="bg-gray-50 p-4 rounded border">
+              <div className="bg-[#F9FAFB] p-4 rounded border border-[#E2E8F0]">
                 <div className="text-gray-600 mb-1">Non-empty Paragraphs</div>
-                <div className="text-3xl font-bold text-indigo-600">{textStats.paragraphs}</div>
+                <div className="text-3xl font-bold text-[#FF8C42]">{textStats.paragraphs}</div>
               </div>
               
-              <div className="bg-gray-50 p-4 rounded border">
+              <div className="bg-[#F9FAFB] p-4 rounded border border-[#E2E8F0]">
                 <div className="text-gray-600 mb-1">Reading Time (approx.)</div>
-                <div className="text-3xl font-bold text-indigo-600">
+                <div className="text-3xl font-bold text-[#3B82F6]">
                   {Math.max(1, Math.round(textStats.words / 200))} min
                 </div>
                 <div className="text-sm text-gray-500 mt-1">Based on average reading speed of 200 words per minute</div>
@@ -948,58 +970,58 @@ export default function AdvancedTextEditor() {
       {/* Remove Elements Dialog */}
       {showRemoveDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-lg">
+          <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-                <FileX size={20} />
+              <h3 className="text-xl font-bold flex items-center gap-2 text-[#2D3748]">
+                <FileX size={20} className="text-[#FF8C42]" />
                 Remove Elements
               </h3>
               <button 
                 onClick={handleCloseRemoveDialog}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-[#FF8C42]"
               >
                 ✕
               </button>
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-800 mb-2">Select what to remove:</label>
+              <label className="block text-[#2D3748] mb-2">Select what to remove:</label>
               
               <div className="space-y-2">
-                <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50">
+                <label className="flex items-center cursor-pointer p-2 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5]">
                   <input 
                     type="radio" 
                     name="removeOption"
                     value="numbers"
                     checked={selectedRemoveOption === 'numbers'}
                     onChange={() => setSelectedRemoveOption('numbers')}
-                    className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    className="w-4 h-4 text-[#FF8C42] focus:ring-[#FF8C42] border-gray-300"
                   />
-                  <span className="ml-2 text-gray-800">Remove all numbers</span>
+                  <span className="ml-2 text-[#2D3748]">Remove all numbers</span>
                 </label>
                 
-                <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50">
+                <label className="flex items-center cursor-pointer p-2 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5]">
                   <input 
                     type="radio" 
                     name="removeOption"
                     value="symbols"
                     checked={selectedRemoveOption === 'symbols'}
                     onChange={() => setSelectedRemoveOption('symbols')}
-                    className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    className="w-4 h-4 text-[#FF8C42] focus:ring-[#FF8C42] border-gray-300"
                   />
-                  <span className="ml-2 text-gray-800">Remove symbols and special characters</span>
+                  <span className="ml-2 text-[#2D3748]">Remove symbols and special characters</span>
                 </label>
                 
-                <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50">
+                <label className="flex items-center cursor-pointer p-2 border border-[#E2E8F0] rounded hover:bg-[#FFF0E5]">
                   <input 
                     type="radio" 
                     name="removeOption"
                     value="custom"
                     checked={selectedRemoveOption === 'custom'}
                     onChange={() => setSelectedRemoveOption('custom')}
-                    className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    className="w-4 h-4 text-[#FF8C42] focus:ring-[#FF8C42] border-gray-300"
                   />
-                  <span className="ml-2 text-gray-800">Custom pattern (regex)</span>
+                  <span className="ml-2 text-[#2D3748]">Custom pattern (regex)</span>
                 </label>
               </div>
               
@@ -1009,7 +1031,7 @@ export default function AdvancedTextEditor() {
                     type="text" 
                     value={customPattern}
                     onChange={(e) => setCustomPattern(e.target.value)}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-900"
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#FF8C42] text-gray-900"
                     placeholder="Ex: \b(word1|word2)\b"
                   />
                   <p className="text-xs text-gray-700 mt-1">
@@ -1022,7 +1044,7 @@ export default function AdvancedTextEditor() {
             <div className="flex justify-end">
               <button
                 onClick={handleRemoveElements}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-1"
+                className="px-4 py-2 bg-[#3B82F6] text-white rounded hover:bg-[#2563EB] transition-colors flex items-center gap-1"
                 disabled={!selectedRemoveOption}
               >
                 <FileX size={16} />
@@ -1035,14 +1057,14 @@ export default function AdvancedTextEditor() {
       
       <style jsx global>{`
         .ProseMirror {
-          color: #000;
+          color: #2D3748;
           font-size: 16px;
-          line-height: 1.5;
+          line-height: 1.6;
           min-height: calc(50vh - 32px); /* Match container minus padding */
           width: 100%;
         }
         .ProseMirror p {
-          color: #000;
+          color: #2D3748;
           margin-bottom: 1em;
         }
         .ProseMirror:focus {
@@ -1052,14 +1074,15 @@ export default function AdvancedTextEditor() {
         .is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;
-          color: #adb5bd;
+          color: #94A3B8;
           pointer-events: none;
           height: 0;
         }
         /* Improve contrast of elements within the editor */
         .ProseMirror ul li, 
         .ProseMirror ol li {
-          color: #000;
+          color: #2D3748;
+          margin-bottom: 0.25em;
         }
         .ProseMirror h1, 
         .ProseMirror h2, 
@@ -1067,17 +1090,47 @@ export default function AdvancedTextEditor() {
         .ProseMirror h4, 
         .ProseMirror h5, 
         .ProseMirror h6 {
-          color: #000;
+          color: #2D3748;
           font-weight: bold;
+          margin-top: 1.5em;
+          margin-bottom: 0.5em;
+        }
+        .ProseMirror h1 {
+          font-size: 1.8em;
+        }
+        .ProseMirror h2 {
+          font-size: 1.5em;
+        }
+        .ProseMirror h3 {
+          font-size: 1.3em;
         }
         .ProseMirror a {
-          color: #3b82f6;
+          color: #3B82F6;
           text-decoration: underline;
         }
         .ProseMirror blockquote {
-          border-left: 3px solid #e5e7eb;
+          border-left: 3px solid #FFB285;
           padding-left: 1rem;
-          color: #000;
+          color: #64748B;
+          font-style: italic;
+          margin: 1em 0;
+        }
+        .ProseMirror pre {
+          background-color: #F9FAFB;
+          color: #2D3748;
+          padding: 0.75em;
+          border-radius: 0.25em;
+          border: 1px solid #E2E8F0;
+          font-family: monospace;
+          overflow-x: auto;
+        }
+        .ProseMirror strong {
+          color: #2D3748;
+          font-weight: bold;
+        }
+        .ProseMirror em {
+          color: #2D3748;
+          font-style: italic;
         }
       `}</style>
     </div>
