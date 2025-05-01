@@ -2,7 +2,16 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #2D3748;
+  --primary: #FF8C42; /* Naranja principal */
+  --primary-light: #FFB285;
+  --primary-dark: #E67539;
+  --accent: #3B82F6; /* Azul acento */
+  --accent-light: #93C5FD;
+  --accent-dark: #2563EB;
+  --neutral-light: #F9FAFB;
+  --neutral: #F1F5F9;
+  --neutral-dark: #E2E8F0;
 }
 
 @theme inline {
