@@ -7,10 +7,13 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
   const [description, setDescription] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
   const [paidBy, setPaidBy] = useState('');
-  const [splitType, setSplitType] = useState('equal'); // 'equal' or 'custom'
+  // Always use equal split
+  const [splitType] = useState('equal');
   const [customAmounts, setCustomAmounts] = useState({});
   const [selectedParticipants, setSelectedParticipants] = useState([]);
   const [errors, setErrors] = useState({});
+  const [multiplePayers, setMultiplePayers] = useState(false);
+  const [payerDetails, setPayerDetails] = useState({});
 
   // Initialize custom amounts when participants change
   useEffect(() => {
@@ -21,13 +24,13 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
         : '0';
     });
     setCustomAmounts(newCustomAmounts);
-  }, [group.participants, selectedParticipants, customAmounts]);
+  }, [group.participants, selectedParticipants]);
 
   // Update split amounts when total amount changes and equal split is selected
   useEffect(() => {
     if (splitType === 'equal' && totalAmount && selectedParticipants.length > 0) {
       const equalAmount = (parseFloat(totalAmount) / selectedParticipants.length).toFixed(2);
-      const newCustomAmounts = {...customAmounts};
+      const newCustomAmounts = {};
       
       selectedParticipants.forEach(name => {
         newCustomAmounts[name] = equalAmount;
@@ -41,11 +44,13 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
       
       setCustomAmounts(newCustomAmounts);
     }
-  }, [totalAmount, selectedParticipants, splitType, customAmounts, group.participants]);
+  }, [totalAmount, selectedParticipants, splitType, group.participants]);
   
-  // Calculate total of custom amounts
-  const calculateCustomTotal = () => {
-    return Object.values(customAmounts)
+  // No longer need to calculate custom amounts as we only use equal split
+  
+  // Calculate total of payer amounts
+  const calculatePayersTotal = () => {
+    return Object.values(payerDetails)
       .filter(amount => amount !== '')
       .reduce((sum, amount) => sum + parseFloat(amount || 0), 0);
   };
@@ -65,30 +70,38 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
       newErrors.amount = 'Valid amount is required';
     }
     
-    if (!paidBy) {
-      newErrors.paidBy = 'Paid by is required';
+    // Validar pagadores
+    if (multiplePayers) {
+      const payersTotal = calculatePayersTotal();
+      const total = parseFloat(totalAmount);
+      
+      if (Math.abs(payersTotal - total) > 0.01) {
+        newErrors.multiplePayers = `The sum of individual payments (${payersTotal.toFixed(2)}) must equal the total (${total.toFixed(2)})`;
+      }
+      
+      // Verify that at least one person has paid something
+      const hasAtLeastOnePayer = Object.values(payerDetails).some(amount => parseFloat(amount || 0) > 0);
+      if (!hasAtLeastOnePayer) {
+        newErrors.multiplePayers = 'At least one person must have paid something';
+      }
+      
+      // Validar montos individuales
+      Object.entries(payerDetails).forEach(([name, amount]) => {
+        if (amount === '' || isNaN(parseFloat(amount))) {
+          newErrors[`payer_${name}`] = `Amount for ${name} is invalid`;
+        }
+      });
+    } else {
+      if (!paidBy) {
+        newErrors.paidBy = 'Paid by is required';
+      }
     }
     
     if (selectedParticipants.length === 0) {
       newErrors.participants = 'At least one participant must be selected';
     }
     
-    if (splitType === 'custom') {
-      const customTotal = calculateCustomTotal();
-      const total = parseFloat(totalAmount);
-      
-      if (Math.abs(customTotal - total) > 0.01) {
-        newErrors.customSplit = `The sum of individual amounts (${customTotal.toFixed(2)}) must equal the total (${total.toFixed(2)})`;
-      }
-      
-      Object.entries(customAmounts).forEach(([name, amount]) => {
-        if (selectedParticipants.includes(name)) {
-          if (amount === '' || isNaN(parseFloat(amount))) {
-            newErrors[`amount_${name}`] = `Amount for ${name} is invalid`;
-          }
-        }
-      });
-    }
+    // Always using equal split - no custom amount validation needed
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -96,13 +109,27 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
     }
     
     // Prepare the expense data
+    
+    // Process payer details if there are multiple payers
+    const processedPayerDetails = {};
+    if (multiplePayers) {
+      Object.entries(payerDetails).forEach(([name, amount]) => {
+        const parsedAmount = parseFloat(amount || 0);
+        if (parsedAmount > 0) {
+          processedPayerDetails[name] = parsedAmount;
+        }
+      });
+    }
+    
     const expenseData = {
       description: description.trim(),
       amount: parseFloat(totalAmount),
-      paidBy,
+      paidBy: multiplePayers ? '' : paidBy, // If there are multiple payers, there's no main payer
       splitAmong: selectedParticipants,
-      splitType,
-      splitDetails: splitType === 'custom' ? customAmounts : null
+      splitType: 'equal', // Always use equal split
+      splitDetails: null, // No custom split details needed
+      multiplePayers,
+      payerDetails: multiplePayers ? processedPayerDetails : null
     };
     
     // Submit the expense data
@@ -115,6 +142,8 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
     setSplitType('equal');
     setSelectedParticipants([]);
     setCustomAmounts({});
+    setMultiplePayers(false);
+    setPayerDetails({});
     setErrors({});
   };
 
@@ -129,13 +158,7 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
     });
   };
   
-  // Handle custom amount change
-  const handleCustomAmountChange = (name, value) => {
-    setCustomAmounts(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // No longer need to handle custom amount changes as we only use equal split
 
   // Check if a participant is selected
   const isParticipantSelected = (participantName) => {
@@ -211,31 +234,113 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
         
         {/* Paid by field */}
         <div className="mb-4">
-          <label htmlFor="paidBy" className="block text-sm font-medium text-gray-700 mb-1">
-            Paid by
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <User size={16} className="text-gray-500" />
+          <div className="flex justify-between items-center mb-1">
+            <label htmlFor="paidBy" className="block text-sm font-medium text-gray-700">
+              Paid by
+            </label>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="multiple-payers"
+                checked={multiplePayers}
+                onChange={() => {
+                  setMultiplePayers(!multiplePayers);
+                  // Inicializar los detalles de pagadores si se activa
+                  if (!multiplePayers) {
+                    const newPayerDetails = {};
+                    group.participants.forEach(participant => {
+                      newPayerDetails[participant.name] = '';
+                    });
+                    setPayerDetails(newPayerDetails);
+                  }
+                }}
+                className="h-4 w-4 text-[#2563EB] focus:ring-[#2563EB] border-gray-300 rounded"
+              />
+              <label
+                htmlFor="multiple-payers"
+                className="ml-2 block text-sm text-gray-700"
+              >
+                Multiple payers
+              </label>
             </div>
-            <select
-              id="paidBy"
-              value={paidBy}
-              onChange={(e) => setPaidBy(e.target.value)}
-              className={`w-full pl-10 px-3 py-2 border ${
-                errors.paidBy ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB] bg-white text-gray-900`}
-            >
-              <option value="">Select who paid</option>
-              {group.participants.map(participant => (
-                <option key={participant.id} value={participant.name}>
-                  {participant.name}
-                </option>
-              ))}
-            </select>
           </div>
-          {errors.paidBy && (
-            <p className="mt-1 text-sm text-red-600">{errors.paidBy}</p>
+          
+          {!multiplePayers ? (
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User size={16} className="text-gray-500" />
+              </div>
+              <select
+                id="paidBy"
+                value={paidBy}
+                onChange={(e) => setPaidBy(e.target.value)}
+                className={`w-full pl-10 px-3 py-2 border ${
+                  errors.paidBy ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB] bg-white text-gray-900`}
+              >
+                <option value="">Select who paid</option>
+                {group.participants.map(participant => (
+                  <option key={participant.id} value={participant.name}>
+                    {participant.name}
+                  </option>
+                ))}
+              </select>
+              {errors.paidBy && (
+                <p className="mt-1 text-sm text-red-600">{errors.paidBy}</p>
+              )}
+            </div>
+          ) : (
+            <div className="mt-2 border border-gray-300 rounded-md divide-y divide-gray-300">
+              <div className="p-3 bg-gray-50 flex justify-between">
+                <span className="text-sm font-medium text-gray-700">Participant</span>
+                <span className="text-sm font-medium text-gray-700">Amount paid</span>
+              </div>
+              
+              {group.participants.map(participant => (
+                <div key={participant.id} className="p-3 flex justify-between items-center">
+                  <span className="text-sm text-gray-800">{participant.name}</span>
+                  <div className="relative w-32">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <DollarSign size={14} className="text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*(\.[0-9]+)?"
+                      placeholder="0.00"
+                      value={payerDetails[participant.name] || ''}
+                      onChange={(e) => {
+                        // Validar que solo se ingresen números y un punto decimal
+                        const value = e.target.value;
+                        if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                          setPayerDetails(prev => ({
+                            ...prev,
+                            [participant.name]: value
+                          }));
+                        }
+                      }}
+                      className={`w-full pl-8 px-3 py-1 border ${
+                        errors[`payer_${participant.name}`] ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                      } rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB] text-gray-900 text-right`}
+                    />
+                  </div>
+                </div>
+              ))}
+              
+              <div className="p-3 bg-gray-50 flex justify-between items-center font-medium">
+                <span className="text-sm text-gray-700">Total</span>
+                <span className={`text-sm pr-4 ${
+                  totalAmount && Math.abs(calculatePayersTotal() - parseFloat(totalAmount)) > 0.01
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+                }`}>
+                  ${formatCurrency(calculatePayersTotal())} / ${formatCurrency(totalAmount)}
+                </span>
+              </div>
+            </div>
+          )}
+          {errors.multiplePayers && (
+            <p className="mt-1 text-sm text-red-600">{errors.multiplePayers}</p>
           )}
         </div>
         
@@ -283,95 +388,9 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
           )}
         </div>
         
-        {/* Split type selection */}
-        {selectedParticipants.length > 0 && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              How to split the expense?
-            </label>
-            <div className="flex gap-3">
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="split-equal"
-                  checked={splitType === 'equal'}
-                  onChange={() => setSplitType('equal')}
-                  className="h-4 w-4 text-[#2563EB] focus:ring-[#2563EB] border-gray-300"
-                />
-                <label
-                  htmlFor="split-equal"
-                  className="ml-2 block text-sm text-gray-800"
-                >
-                  Split equally
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="split-custom"
-                  checked={splitType === 'custom'}
-                  onChange={() => setSplitType('custom')}
-                  className="h-4 w-4 text-[#2563EB] focus:ring-[#2563EB] border-gray-300"
-                />
-                <label
-                  htmlFor="split-custom"
-                  className="ml-2 block text-sm text-gray-800"
-                >
-                  Custom amounts
-                </label>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Split type is always equal - no selection needed */}
         
-        {/* Custom split amounts */}
-        {splitType === 'custom' && selectedParticipants.length > 0 && (
-          <div className="mb-4">
-            <div className="mt-2 border border-gray-300 rounded-md divide-y divide-gray-300">
-              <div className="p-3 bg-gray-50 flex justify-between">
-                <span className="text-sm font-medium text-gray-700">Participant</span>
-                <span className="text-sm font-medium text-gray-700">Amount</span>
-              </div>
-              
-              {selectedParticipants.map(name => (
-                <div key={name} className="p-3 flex justify-between items-center">
-                  <span className="text-sm text-gray-800">{name}</span>
-                  <div className="relative w-32">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <DollarSign size={14} className="text-gray-400" />
-                    </div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      value={customAmounts[name] || ''}
-                      onChange={(e) => handleCustomAmountChange(name, e.target.value)}
-                      className={`w-full pl-8 px-3 py-1 border ${
-                        errors[`amount_${name}`] ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                      } rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563EB] text-gray-900 text-right`}
-                    />
-                  </div>
-                </div>
-              ))}
-              
-              <div className="p-3 bg-gray-50 flex justify-between items-center font-medium">
-                <span className="text-sm text-gray-700">Total</span>
-                <span className={`text-sm pr-4 ${
-                  totalAmount && Math.abs(calculateCustomTotal() - parseFloat(totalAmount)) > 0.01
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-                }`}>
-                  ${formatCurrency(calculateCustomTotal())} / ${formatCurrency(totalAmount)}
-                </span>
-              </div>
-            </div>
-            
-            {errors.customSplit && (
-              <p className="mt-1 text-sm text-red-600">{errors.customSplit}</p>
-            )}
-          </div>
-        )}
+        {/* Equal split is always used - no custom amounts needed */}
         
         {/* Action buttons */}
         <div className="flex gap-2 justify-end">

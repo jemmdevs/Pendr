@@ -16,101 +16,124 @@ export default function SettlementView({ group, expenses }) {
       return;
     }
     
-    // Calculate how much each person paid in total
+    // Inicializar los totales para todos los participantes
     const totalPaid = {};
-    group.participants.forEach(participant => {
-      totalPaid[participant.name] = 0;
-    });
-    
-    // Add up all expenses paid by each person
-    expenses.forEach(expense => {
-      if (totalPaid[expense.paidBy] !== undefined) {
-        totalPaid[expense.paidBy] += parseFloat(expense.amount);
-      }
-    });
-    
-    // Calculate how much each person should have paid (their share)
-    const totalExpenses = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
     const shares = {};
     
-    // First, calculate expenses per participant based on split
+    group.participants.forEach(participant => {
+      totalPaid[participant.name] = 0;
+      shares[participant.name] = 0;
+    });
+    
+    // Procesar cada gasto
     expenses.forEach(expense => {
       const amount = parseFloat(expense.amount);
+      const paidBy = expense.paidBy;
       
-      if (expense.splitType === 'custom' && expense.splitDetails) {
-        // Use custom amounts for each participant
-        expense.splitAmong.forEach(person => {
-          if (!shares[person]) {
-            shares[person] = 0;
+      // Registrar quién pagó este gasto
+      if (totalPaid[paidBy] !== undefined) {
+        // Si hay un solo pagador, registrar el monto completo
+        totalPaid[paidBy] += amount;
+      }
+      
+      // Si hay múltiples pagadores con montos diferentes
+      if (expense.multiplePayers && expense.payerDetails) {
+        // Restar el monto del pagador principal para evitar duplicación
+        if (totalPaid[paidBy] !== undefined) {
+          totalPaid[paidBy] -= amount;
+        }
+        
+        // Registrar los montos individuales para cada pagador
+        Object.entries(expense.payerDetails).forEach(([person, payAmount]) => {
+          if (totalPaid[person] !== undefined) {
+            totalPaid[person] += parseFloat(payAmount || 0);
           }
-          
-          const customAmount = parseFloat(expense.splitDetails[person] || 0);
-          shares[person] += customAmount;
+        });
+      }
+      
+      // Calcular cómo se divide este gasto entre los participantes
+      if (expense.splitType === 'custom' && expense.splitDetails) {
+        // División personalizada
+        expense.splitAmong.forEach(person => {
+          if (shares[person] !== undefined) {
+            const customAmount = parseFloat(expense.splitDetails[person] || 0);
+            shares[person] += customAmount;
+          }
         });
       } else {
-        // Fall back to equal split
+        // División equitativa
         const splitCount = expense.splitAmong.length;
-        
         if (splitCount > 0) {
           const shareAmount = amount / splitCount;
-          
           expense.splitAmong.forEach(person => {
-            if (!shares[person]) {
-              shares[person] = 0;
+            if (shares[person] !== undefined) {
+              shares[person] += shareAmount;
             }
-            shares[person] += shareAmount;
           });
         }
       }
     });
     
-    // Calculate net balance (paid - share)
+    // Verificar que la suma de las partes sea igual al total de gastos
+    const totalExpenses = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+    const totalShares = Object.values(shares).reduce((sum, share) => sum + share, 0);
+    
+    if (Math.abs(totalShares - totalExpenses) > 0.01) {
+      console.log('Advertencia: La suma de las partes no coincide con el total de gastos');
+      console.log('Total de gastos:', totalExpenses.toFixed(2));
+      console.log('Suma de partes:', totalShares.toFixed(2));
+    }
+    
+    // Calcular el balance neto para cada persona (pagado - parte)
     const balances = {};
-    Object.keys(shares).forEach(person => {
-      balances[person] = (totalPaid[person] || 0) - (shares[person] || 0);
+    group.participants.forEach(participant => {
+      const name = participant.name;
+      balances[name] = (totalPaid[name] || 0) - (shares[name] || 0);
     });
     
-    // People who paid more than their share (positive balance) should receive money
-    // People who paid less than their share (negative balance) should pay money
+    // Identificar acreedores (balance positivo) y deudores (balance negativo)
     const creditors = Object.keys(balances)
-      .filter(person => balances[person] > 0)
+      .filter(person => balances[person] > 0.01) // Usar un pequeño umbral para evitar problemas de punto flotante
       .sort((a, b) => balances[b] - balances[a]);
       
     const debtors = Object.keys(balances)
-      .filter(person => balances[person] < 0)
-      .sort((a, b) => balances[a] - balances[b]);
+      .filter(person => balances[person] < -0.01) // Usar un pequeño umbral para evitar problemas de punto flotante
+      .sort((a, b) => balances[a] - balances[b]); // Ordenar de mayor deuda a menor deuda
     
-    // Calculate the settlement transactions
+    // Calcular las transacciones de liquidación
     const transactions = [];
-    
-    // Copy balances to keep track of remaining amounts
     const remainingBalances = { ...balances };
     
-    // For each debtor, figure out who they should pay
+    // Para cada deudor, determinar a quién debe pagar
     debtors.forEach(debtor => {
-      let amountToPayTotal = -remainingBalances[debtor]; // Convert negative to positive
+      let amountToPayTotal = -remainingBalances[debtor]; // Convertir el balance negativo a positivo
       
-      // Keep attempting to settle while the debtor still owes money
       creditors.forEach(creditor => {
-        if (amountToPayTotal > 0 && remainingBalances[creditor] > 0) {
-          // The amount to pay this creditor is the minimum of what the debtor owes
-          // and what the creditor is owed
+        if (amountToPayTotal > 0.01 && remainingBalances[creditor] > 0.01) {
+          // El monto a pagar es el mínimo entre lo que debe el deudor y lo que se le debe al acreedor
           const amountToPay = Math.min(amountToPayTotal, remainingBalances[creditor]);
           
-          if (amountToPay > 0.01) { // Ignore very small amounts due to floating point
+          if (amountToPay > 0.01) { // Ignorar montos muy pequeños
             transactions.push({
               from: debtor,
               to: creditor,
-              amount: parseFloat(amountToPay.toFixed(2)) // Round to 2 decimal places
+              amount: parseFloat(amountToPay.toFixed(2)) // Redondear a 2 decimales
             });
             
-            // Update remaining balances
+            // Actualizar los balances restantes
             amountToPayTotal -= amountToPay;
             remainingBalances[creditor] -= amountToPay;
+            remainingBalances[debtor] += amountToPay; // Esto debería acercarse a cero
           }
         }
       });
     });
+    
+    // Registrar información de depuración
+    console.log('Pagos totales:', totalPaid);
+    console.log('Partes totales:', shares);
+    console.log('Balances:', balances);
+    console.log('Transacciones de liquidación:', transactions);
     
     // Set the calculated settlements
     setSettlements(transactions);
@@ -181,9 +204,19 @@ export default function SettlementView({ group, expenses }) {
               <tbody>
                 {group.participants.map(participant => {
                   // Calculate total paid by this participant
-                  const paid = expenses
-                    .filter(e => e.paidBy === participant.name)
-                    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+                  let paid = 0;
+                  
+                  // Sumar gastos donde esta persona es el pagador principal
+                  expenses.forEach(expense => {
+                    if (expense.paidBy === participant.name && !expense.multiplePayers) {
+                      paid += parseFloat(expense.amount);
+                    }
+                    
+                    // Sumar pagos cuando hay múltiples pagadores
+                    if (expense.multiplePayers && expense.payerDetails && expense.payerDetails[participant.name]) {
+                      paid += parseFloat(expense.payerDetails[participant.name]);
+                    }
+                  });
                   
                   // Get their share of expenses
                   const share = totalOwed[participant.name] || 0;
