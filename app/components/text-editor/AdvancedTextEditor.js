@@ -88,22 +88,25 @@ export default function AdvancedTextEditor() {
     }
   }, [showRemoveDialog]);
 
-  // Make the entire editor area clickable
+  // Focus the editor when clicking on the container anywhere
   useEffect(() => {
-    const handleContainerClick = (e) => {
-      if (editor && e.target === editorContainerRef.current) {
-        editor.commands.focus();
-      }
+    // Skip if editor or container ref is not available
+    if (!editor || !editorContainerRef.current) return;
+    
+    // Capture the current reference safely
+    const currentContainer = editorContainerRef.current;
+    
+    // Define handler function
+    const handleContainerClick = () => {
+      if (editor) editor.commands.focus();
     };
-
-    if (editorContainerRef.current) {
-      editorContainerRef.current.addEventListener('click', handleContainerClick);
-    }
-
+    
+    // Add event listener to the captured reference
+    currentContainer.addEventListener('click', handleContainerClick);
+    
+    // Return cleanup function that uses the captured reference
     return () => {
-      if (editorContainerRef.current) {
-        editorContainerRef.current.removeEventListener('click', handleContainerClick);
-      }
+      currentContainer.removeEventListener('click', handleContainerClick);
     };
   }, [editor]);
 

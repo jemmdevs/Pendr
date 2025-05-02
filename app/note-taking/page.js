@@ -46,7 +46,7 @@ export default function NoteTakingPage() {
               Note Taking Tips
             </h2>
             <ul className="ml-6 list-disc text-sm text-gray-600 space-y-1">
-              <li>Create new notes by clicking the "Add Note" button</li>
+              <li>Create new notes by clicking the &ldquo;Add Note&rdquo; button</li>
               <li>Mark notes as completed by clicking the checkbox</li>
               <li>Edit your notes by clicking on them</li>
               <li>Delete notes by clicking the trash icon</li>
