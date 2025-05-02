@@ -19,6 +19,16 @@ export default function Header() {
                   Text Editor
                 </Link>
               </li>
+              <li>
+                <Link href="/note-taking" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Notes
+                </Link>
+              </li>
+              <li>
+                <Link href="/base64-tool" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Base64 Tool
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
