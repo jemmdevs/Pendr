@@ -133,7 +133,7 @@ export default function SettlementView({ group, expenses }) {
           <p className="text-gray-700">All expenses are already settled!</p>
         ) : (
           <p className="text-gray-700">
-            Based on the expenses recorded, here's how to settle the balance.
+            Based on the expenses recorded, here&apos;s how to settle the balance.
           </p>
         )}
       </div>
@@ -254,4 +254,4 @@ export default function SettlementView({ group, expenses }) {
       )}
     </div>
   );
-} 
+}

@@ -21,7 +21,7 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
         : '0';
     });
     setCustomAmounts(newCustomAmounts);
-  }, [group.participants, selectedParticipants]);
+  }, [group.participants, selectedParticipants, customAmounts]);
 
   // Update split amounts when total amount changes and equal split is selected
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
       
       setCustomAmounts(newCustomAmounts);
     }
-  }, [totalAmount, selectedParticipants, splitType]);
+  }, [totalAmount, selectedParticipants, splitType, customAmounts, group.participants]);
   
   // Calculate total of custom amounts
   const calculateCustomTotal = () => {
@@ -249,7 +249,7 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
           } rounded-md`}>
             <div className="flex items-center mb-2">
               <Users size={16} className="text-gray-500 mr-2" />
-              <span className="text-sm text-gray-600">Select who's splitting this expense</span>
+              <span className="text-sm text-gray-600">Select who&apos;s splitting this expense</span>
             </div>
             
             {group.participants.length > 0 ? (
@@ -392,4 +392,4 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
       </form>
     </div>
   );
-} 
+}
