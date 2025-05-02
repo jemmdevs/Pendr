@@ -1,6 +1,6 @@
 import Header from './components/Header';
 import Link from 'next/link';
-import { FileText, Edit, Pencil, Type, Code } from 'lucide-react';
+import { FileText, Edit, Pencil, Type, Code, Receipt } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
             Welcome to <span className="text-[#FF8C42]">Pendr</span>
           </h1>
           <p className="text-xl text-gray-600 text-center max-w-2xl mb-10">
-            Your all-in-one writing toolbox for creating, editing, and formatting text with ease.
+            Your all-in-one toolbox for writing, note-taking, and utility tools.
           </p>
           <Link 
             href="/text-editor" 
@@ -29,10 +29,10 @@ export default function Home() {
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-[#2D3748] mb-12">
-            Your <span className="text-[#FF8C42]">Perfect</span> Writing Tools
+            Your <span className="text-[#FF8C42]">Perfect</span> Tools
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Text Editor Module */}
             <Link href="/text-editor" className="group">
               <div className="bg-[#F9FAFB] rounded-lg border border-[#E2E8F0] p-8 hover:shadow-md transition-all h-full flex flex-col">
@@ -95,15 +95,36 @@ export default function Home() {
                 </div>
               </div>
             </Link>
+            
+            {/* Bill Split Module */}
+            <Link href="/bill-split" className="group">
+              <div className="bg-[#F9FAFB] rounded-lg border border-[#E2E8F0] p-8 hover:shadow-md transition-all h-full flex flex-col">
+                <div className="bg-[#93C5FD] p-4 rounded-xl w-16 h-16 flex items-center justify-center text-white mb-6">
+                  <Receipt size={32} />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2D3748] group-hover:text-[#FF8C42] transition-colors mb-3">
+                  Bill Split
+                </h3>
+                <p className="text-gray-600 flex-grow">
+                  Split expenses among friends and calculate who owes what to whom.
+                </p>
+                <div className="flex items-center mt-6 text-[#3B82F6] font-medium">
+                  Try it now
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
       
       {/* CTA Section */}
       <section className="py-16 bg-[#FFF0E5]">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-[#2D3748] mb-6">
-            Ready to Enhance Your Writing?
+            Ready to Explore Our Tools?
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Start using our tools today and experience the difference.
@@ -111,21 +132,27 @@ export default function Home() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link 
               href="/text-editor" 
-              className="bg-[#3B82F6] hover:bg-[#2563EB] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
             >
               Try Text Editor
             </Link>
             <Link 
               href="/note-taking" 
-              className="bg-[#93C5FD] hover:bg-[#60A5FA] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+              className="bg-[#E67E22] hover:bg-[#D35400] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
             >
               Try Note Taking
             </Link>
             <Link 
               href="/base64-tool" 
-              className="bg-[#FFA07A] hover:bg-[#FF7F50] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
             >
               Try Base64 Tool
+            </Link>
+            <Link 
+              href="/bill-split" 
+              className="bg-[#E67E22] hover:bg-[#D35400] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+            >
+              Try Bill Split
             </Link>
           </div>
         </div>

@@ -29,6 +29,11 @@ export default function Header() {
                   Base64 Tool
                 </Link>
               </li>
+              <li>
+                <Link href="/bill-split" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Bill Split
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
