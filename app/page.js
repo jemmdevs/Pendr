@@ -1,6 +1,6 @@
 import Header from './components/Header';
 import Link from 'next/link';
-import { FileText, Edit, Pencil, Type, Code, Receipt } from 'lucide-react';
+import { FileText, Edit, Pencil, Type, Code, Receipt, Calculator } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -116,6 +116,27 @@ export default function Home() {
                 </div>
               </div>
             </Link>
+            
+            {/* Calculator Module */}
+            <Link href="/calculator" className="group">
+              <div className="bg-[#F9FAFB] rounded-lg border border-[#E2E8F0] p-8 hover:shadow-md transition-all h-full flex flex-col">
+                <div className="bg-[#4ADE80] p-4 rounded-xl w-16 h-16 flex items-center justify-center text-white mb-6">
+                  <Calculator size={32} />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2D3748] group-hover:text-[#FF8C42] transition-colors mb-3">
+                  Calculator
+                </h3>
+                <p className="text-gray-600 flex-grow">
+                  Powerful calculator with standard, scientific and unit conversion modes.
+                </p>
+                <div className="flex items-center mt-6 text-[#3B82F6] font-medium">
+                  Try it now
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -153,6 +174,12 @@ export default function Home() {
               className="bg-[#E67E22] hover:bg-[#D35400] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
             >
               Try Bill Split
+            </Link>
+            <Link 
+              href="/calculator" 
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+            >
+              Try Calculator
             </Link>
           </div>
         </div>

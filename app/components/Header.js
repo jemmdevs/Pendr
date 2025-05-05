@@ -34,6 +34,11 @@ export default function Header() {
                   Bill Split
                 </Link>
               </li>
+              <li>
+                <Link href="/calculator" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Calculator
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -55,4 +60,4 @@ export default function Header() {
       </div>
     </header>
   );
-} 
+}
