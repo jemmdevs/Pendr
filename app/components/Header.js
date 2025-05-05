@@ -39,6 +39,11 @@ export default function Header() {
                   Calculator
                 </Link>
               </li>
+              <li>
+                <Link href="/password-checker" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Password Checker
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
