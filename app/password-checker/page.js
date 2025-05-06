@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Shield } from 'lucide-react';
-import PasswordChecker from '../components/password-checker/PasswordCheckerNew';
+import PasswordChecker from '../components/password-checker/PasswordCheckerClean';
 
 // This is a simplified version without importing the problematic component
 export default function PasswordCheckerPage() {
