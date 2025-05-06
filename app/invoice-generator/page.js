@@ -1,11 +1,11 @@
 'use client';
 
-import Calculator from '../components/calculator/Calculator';
+import InvoiceGenerator from '../components/invoice-generator/InvoiceGenerator';
 import Header from '../components/Header';
-import { Calculator as CalcIcon } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import Link from 'next/link';
 
-export default function CalculatorPage() {
+export default function InvoiceGeneratorPage() {
   return (
     <>
       <Header />
@@ -16,30 +16,30 @@ export default function CalculatorPage() {
           <div className="flex items-center text-sm text-gray-500 mb-2">
             <Link href="/" className="hover:text-[#FF8C42] transition-colors">Home</Link>
             <span className="mx-2">/</span>
-            <span className="text-[#FF8C42]">Calculator</span>
+            <span className="text-[#FF8C42]">Invoice Generator</span>
           </div>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="bg-[#4ADE80] p-3 rounded-lg mr-4 text-white">
-                <CalcIcon size={24} />
+              <div className="bg-[#F97316] p-3 rounded-lg mr-4 text-white">
+                <FileText size={24} />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-[#2D3748]">
-                Advanced Calculator
+                Professional Invoice Generator
               </h1>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Calculator container */}
+      {/* Invoice Generator container */}
       <div className="bg-white py-8 px-6 flex-1">
         <div className="max-w-6xl mx-auto">
           <div className="bg-[#F9FAFB] rounded-lg border border-[#E2E8F0] shadow-sm p-2 md:p-4">
             <p className="text-gray-600 mb-4">
-              A powerful calculator with standard, scientific and unit conversion modes.
+              Create, customize, and download professional invoices. Save templates for future use.
             </p>
-            <Calculator />
+            <InvoiceGenerator />
           </div>
           
           {/* Tips section */}
@@ -48,12 +48,13 @@ export default function CalculatorPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#3B82F6]" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
-              Calculator Tips
+              Invoice Tips
             </h2>
             <ul className="ml-6 list-disc text-sm text-gray-600 space-y-1">
-              <li>Use the mode selector to switch between standard, scientific, and unit conversion</li>
-              <li>Memory functions allow you to store and recall values</li>
-              <li>History feature lets you see your previous calculations</li>
+              <li>Include all necessary business and client information for legal compliance</li>
+              <li>Set clear payment terms and due dates</li>
+              <li>Save your invoice templates for consistent branding</li>
+              <li>Use the PDF export feature for professional documents</li>
             </ul>
           </div>
         </div>

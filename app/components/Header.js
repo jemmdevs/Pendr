@@ -44,6 +44,11 @@ export default function Header() {
                   Password Checker
                 </Link>
               </li>
+              <li>
+                <Link href="/invoice-generator" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Facturas
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
