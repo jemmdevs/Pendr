@@ -7,10 +7,13 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+  const [windowWidth, setWindowWidth] = useState(0);
 
-  // Handle window resize
+  // Handle window resize and set initial width
   useEffect(() => {
+    // Set initial window width once component is mounted
+    setWindowWidth(window.innerWidth);
+    
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       if (window.innerWidth >= 1024) {
