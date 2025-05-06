@@ -98,6 +98,11 @@ export default function Header() {
                   QR Generator
                 </Link>
               </li>
+              <li>
+                <Link href="/xml-converter" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  XML Converter
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -223,6 +228,15 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   QR Generator
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/xml-converter" 
+                  className="block py-2 text-gray-600 hover:text-[#FF8C42] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  XML Converter
                 </Link>
               </li>
             </ul>
