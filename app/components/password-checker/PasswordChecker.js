@@ -32,11 +32,6 @@ export default function PasswordChecker() {
     'superman', 'trustno1', 'sunshine', 'iloveyou', 'princess'
   ];
   
-  // Evaluar la contraseña cuando cambia
-  useEffect(() => {
-    evaluatePassword(password);
-  }, [password, evaluatePassword]);
-  
   // Función para evaluar la seguridad de la contraseña
   const evaluatePassword = (pass) => {
     if (!pass) {
@@ -130,6 +125,10 @@ export default function PasswordChecker() {
     setFeedback(newFeedback);
     setSuggestions(newSuggestions);
   };
+
+  useEffect(() => {
+    evaluatePassword(password);
+  }, [password]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Función para guardar la contraseña en el historial
   const savePassword = () => {

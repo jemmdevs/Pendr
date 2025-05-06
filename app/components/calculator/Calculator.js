@@ -70,13 +70,6 @@ export default function Calculator() {
     area: ['mm2', 'cm2', 'm2', 'km2', 'inch2', 'feet2', 'acre'],
   };
   
-  // Efecto para cargar tipos de cambio cuando se selecciona el modo de moneda
-  useEffect(() => {
-    if (mode === 'currency') {
-      fetchExchangeRates();
-    }
-  }, [mode, fromCurrency, fetchExchangeRates]);
-  
   // Función para obtener tipos de cambio
   const fetchExchangeRates = async () => {
     if (!fromCurrency) return;
@@ -105,6 +98,13 @@ export default function Calculator() {
       setIsLoadingRates(false);
     }
   };
+
+  // Efecto para cargar tipos de cambio cuando se selecciona el modo de moneda
+  useEffect(() => {
+    if (mode === 'currency') {
+      fetchExchangeRates();
+    }
+  }, [mode, fromCurrency]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Función para convertir moneda
   const convertCurrency = (amount, from, to, rates = exchangeRates) => {

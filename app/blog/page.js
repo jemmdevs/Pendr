@@ -50,7 +50,7 @@ export default function BlogPage() {
         <div className="max-w-6xl mx-auto">
           <div className="bg-[#F9FAFB] rounded-lg border border-[#E2E8F0] shadow-sm p-2 md:p-4">
             <p className="text-gray-600 mb-4">
-              Welcome to the Pendr Developer Blog. Here you'll find updates, tips, and announcements about our tools and features.
+              Welcome to the Pendr Developer Blog. Here you&apos;ll find updates, tips, and announcements about our tools and features.
             </p>
             <BlogList posts={posts} />
           </div>
@@ -65,7 +65,7 @@ export default function BlogPage() {
             </h2>
             <p className="text-sm text-gray-600">
               Check back regularly for new posts about feature updates, productivity tips, and announcements. 
-              We use this blog to communicate important information about Pendr's development and future plans.
+              We use this blog to communicate important information about Pendr&apos;s development and future plans.
             </p>
           </div>
         </div>
