@@ -24,7 +24,7 @@ export default function ExpenseForm({ group, onSubmit, onCancel }) {
         : '0';
     });
     setCustomAmounts(newCustomAmounts);
-  }, [group.participants, selectedParticipants]);
+  }, [group.participants, selectedParticipants, customAmounts]);
 
   // Update split amounts when total amount changes and equal split is selected
   useEffect(() => {
