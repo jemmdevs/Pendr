@@ -1,11 +1,152 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Lock, Check, X, AlertTriangle, Info, ArrowLeft, Shield, Save } from 'lucide-react';
-import Link from 'next/link';
+import { useState, useRef } from 'react';
+import { Lock, Check, X, AlertTriangle, Info, Copy, RefreshCw, Shield } from 'lucide-react';
 
 export default function PasswordChecker() {
-  // Estados para el verificador de contraseñas
+  // Password state and UI controls
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [strength, setStrength] = useState(0); // 0-100
+  const [feedback, setFeedback] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isCopied, setIsCopied] = useState(false);
+  
+  // Password criteria
+  const criteria = [
+    { id: 'length', label: 'At least 8 characters', met: false },
+    { id: 'uppercase', label: 'Contains uppercase letters', met: false },
+    { id: 'lowercase', label: 'Contains lowercase letters', met: false },
+    { id: 'numbers', label: 'Contains numbers', met: false },
+    { id: 'special', label: 'Contains special characters', met: false },
+  ];
+  
+  // Reference to store criteria state
+  const criteriaRef = useRef(criteria.map(c => ({ ...c })));
+  
+  // Function to evaluate password strength
+  const evaluatePassword = (pass) => {
+    if (!pass) {
+      setStrength(0);
+      setFeedback([]);
+      setSuggestions([]);
+      criteriaRef.current = criteria.map(c => ({ ...c, met: false }));
+      return;
+    }
+    
+    // Check criteria
+    const meetsLength = pass.length >= 8;
+    const meetsUppercase = /[A-Z]/.test(pass);
+    const meetsLowercase = /[a-z]/.test(pass);
+    const meetsNumbers = /[0-9]/.test(pass);
+    const meetsSpecial = /[^A-Za-z0-9]/.test(pass);
+    
+    // Update criteria state
+    criteriaRef.current = [
+      { id: 'length', label: 'At least 8 characters', met: meetsLength },
+      { id: 'uppercase', label: 'Contains uppercase letters', met: meetsUppercase },
+      { id: 'lowercase', label: 'Contains lowercase letters', met: meetsLowercase },
+      { id: 'numbers', label: 'Contains numbers', met: meetsNumbers },
+      { id: 'special', label: 'Contains special characters', met: meetsSpecial },
+    ];
+    
+    // Calculate score
+    let score = 0;
+    if (meetsLength) score += 20;
+    if (meetsUppercase) score += 20;
+    if (meetsLowercase) score += 20;
+    if (meetsNumbers) score += 20;
+    if (meetsSpecial) score += 20;
+    
+    // Penalty for short passwords
+    if (pass.length < 6) score = Math.max(score - 20, 0);
+    
+    // Bonus for longer passwords
+    if (pass.length > 12) score = Math.min(score + 10, 100);
+    if (pass.length > 16) score = Math.min(score + 10, 100);
+    
+    // Penalty for repetitive patterns
+    if (/(.+)\1{2,}/.test(pass)) score = Math.max(score - 15, 0);
+    
+    // Generate feedback
+    const newFeedback = [];
+    const newSuggestions = [];
+    
+    if (score < 50) {
+      newFeedback.push('Your password is weak');
+    } else if (score < 80) {
+      newFeedback.push('Your password is moderate');
+    } else {
+      newFeedback.push('Your password is strong');
+    }
+    
+    // Generate suggestions based on unmet criteria
+    if (!meetsLength) {
+      newSuggestions.push('Make your password longer (at least 8 characters)');
+    }
+    if (!meetsUppercase) {
+      newSuggestions.push('Add uppercase letters (A-Z)');
+    }
+    if (!meetsLowercase) {
+      newSuggestions.push('Add lowercase letters (a-z)');
+    }
+    if (!meetsNumbers) {
+      newSuggestions.push('Add numbers (0-9)');
+    }
+    if (!meetsSpecial) {
+      newSuggestions.push('Add special characters (!, @, #, etc.)');
+    }
+    
+    setStrength(score);
+    setFeedback(newFeedback);
+    setSuggestions(newSuggestions);
+  };
+  
+  // Handle password input changes
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    evaluatePassword(newPassword);
+  };
+  
+  // Function to generate a strong password
+  const generatePassword = () => {
+    const length = 16;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=<>?';
+    let generatedPassword = '';
+    
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      generatedPassword += charset[randomIndex];
+    }
+    
+    setPassword(generatedPassword);
+    evaluatePassword(generatedPassword);
+    setShowPassword(true);
+  };
+  
+  // Function to copy password to clipboard
+  const copyToClipboard = () => {
+    if (password) {
+      navigator.clipboard.writeText(password);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+  
+  // Helper function to get strength color
+  const getStrengthColor = () => {
+    if (strength < 50) return 'bg-red-500';
+    if (strength < 80) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+  
+  // Helper function to get strength text
+  const getStrengthText = () => {
+    if (strength < 50) return 'Weak';
+    if (strength < 80) return 'Moderate';
+    return 'Strong';
+  };
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [strength, setStrength] = useState(0); // 0-100
@@ -21,15 +162,6 @@ export default function PasswordChecker() {
     { id: 'lowercase', label: 'Contains lowercase letters', met: false },
     { id: 'numbers', label: 'Contains numbers', met: false },
     { id: 'special', label: 'Contains special characters', met: false },
-    { id: 'noCommon', label: 'Not a common password', met: false },
-  ];
-  
-  // Lista de contraseñas comunes
-  const commonPasswords = [
-    'password', '123456', 'qwerty', 'admin', 'welcome',
-    'password123', '12345678', '111111', '1234567890', 'abc123',
-    'letmein', 'monkey', 'dragon', 'baseball', 'football',
-    'superman', 'trustno1', 'sunshine', 'iloveyou', 'princess'
   ];
   
   useEffect(() => {
@@ -48,7 +180,6 @@ export default function PasswordChecker() {
       const meetsLowercase = /[a-z]/.test(pass);
       const meetsNumbers = /[0-9]/.test(pass);
       const meetsSpecial = /[^A-Za-z0-9]/.test(pass);
-      const isCommon = commonPasswords.includes(pass.toLowerCase());
       
       // Actualizar estado de los criterios
       const updatedCriteria = [
@@ -57,17 +188,15 @@ export default function PasswordChecker() {
         { id: 'lowercase', label: 'Contains lowercase letters', met: meetsLowercase },
         { id: 'numbers', label: 'Contains numbers', met: meetsNumbers },
         { id: 'special', label: 'Contains special characters', met: meetsSpecial },
-        { id: 'noCommon', label: 'Not a common password', met: !isCommon },
       ];
       
       // Calcular puntuación
       let score = 0;
       if (meetsLength) score += 20;
-      if (meetsUppercase) score += 15;
-      if (meetsLowercase) score += 15;
-      if (meetsNumbers) score += 15;
+      if (meetsUppercase) score += 20;
+      if (meetsLowercase) score += 20;
+      if (meetsNumbers) score += 20;
       if (meetsSpecial) score += 20;
-      if (!isCommon) score += 15;
       
       // Penalización por contraseñas cortas
       if (pass.length < 6) score = Math.max(score - 20, 0);
@@ -128,14 +257,15 @@ export default function PasswordChecker() {
     };
 
     evaluatePassword(password);
-  }, [password, commonPasswords]);
+  }, [password]);
   
   // Función para guardar la contraseña en el historial
   const savePassword = () => {
-    if (password && !passwordHistory.includes(password)) {
-      const newHistory = [{ password, strength, date: new Date() }, ...passwordHistory];
-      setPasswordHistory(newHistory.slice(0, 10)); // Mantener solo las últimas 10 contraseñas
-      setPassword('');
+    if (password) {
+      setPasswordHistory(prev => [
+        { password, strength, date: new Date() },
+        ...prev
+      ]);
     }
   };
   
