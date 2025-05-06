@@ -103,6 +103,11 @@ export default function Header() {
                   XML Converter
                 </Link>
               </li>
+              <li>
+                <Link href="/blog" className="text-gray-600 hover:text-[#FF8C42] transition-colors">
+                  Blog
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -237,6 +242,15 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   XML Converter
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/blog" 
+                  className="block py-2 text-gray-600 hover:text-[#FF8C42] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
                 </Link>
               </li>
             </ul>
