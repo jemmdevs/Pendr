@@ -67,7 +67,7 @@ export default function ContactForm() {
       {isSubmitted ? (
         <div className="bg-green-50 border border-green-200 rounded-md p-4 flex items-center text-green-700">
           <CheckCircle className="mr-2" size={20} />
-          <p>Thank you for your message! I'll get back to you soon.</p>
+          <p>Thank you for your message! I&apos;ll get back to you soon.</p>
         </div>
       ) : (
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
