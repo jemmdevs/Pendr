@@ -35,7 +35,7 @@ export default function PasswordChecker() {
   // Evaluar la contraseña cuando cambia
   useEffect(() => {
     evaluatePassword(password);
-  }, [password]);
+  }, [password, evaluatePassword]);
   
   // Función para evaluar la seguridad de la contraseña
   const evaluatePassword = (pass) => {

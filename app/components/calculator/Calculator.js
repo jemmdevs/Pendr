@@ -75,7 +75,7 @@ export default function Calculator() {
     if (mode === 'currency') {
       fetchExchangeRates();
     }
-  }, [mode, fromCurrency]);
+  }, [mode, fromCurrency, fetchExchangeRates]);
   
   // Función para obtener tipos de cambio
   const fetchExchangeRates = async () => {

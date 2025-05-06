@@ -58,7 +58,7 @@ export default function QRGeneratorPage() {
             <ul className="ml-6 list-disc text-sm text-gray-600 space-y-1">
               <li>QR codes work best when they have good contrast and are easily scannable</li>
               <li>Keep file sizes reasonable for better performance</li>
-              <li>In this beta version, files are stored locally in your browser's storage</li>
+              <li>In this beta version, files are stored locally in your browser&apos;s storage</li>
               <li>Shared links will only work on the device where files were uploaded</li>
             </ul>
           </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Download, FileText } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SharedFilePage({ params }) {
   const [fileData, setFileData] = useState(null);
@@ -57,10 +58,13 @@ export default function SharedFilePage({ params }) {
     if (fileData.type.startsWith('image/')) {
       return (
         <div className="flex justify-center">
-          <img 
+          <Image 
             src={fileData.data} 
             alt={fileData.name}
+            width={500}
+            height={500}
             className="max-w-full max-h-[500px] object-contain rounded-lg shadow-md"
+            unoptimized={true}
           />
         </div>
       );

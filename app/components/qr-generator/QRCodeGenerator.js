@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { QRCodeSVG } from 'qrcode.react';
 import { Upload, Copy, Download, Trash, Link as LinkIcon } from 'lucide-react';
+import Image from 'next/image';
 
 export default function QRCodeGenerator() {
   const [files, setFiles] = useState([]);
@@ -264,11 +265,14 @@ export default function QRCodeGenerator() {
                   >
                     <div className="flex-shrink-0 h-10 w-10 rounded bg-gray-200 flex items-center justify-center">
                       {file.type.startsWith('image/') ? (
-                        <img 
+                        <Image 
                           src={file.preview} 
                           alt={file.name}
+                          width={40}
+                          height={40}
                           className="h-10 w-10 object-cover rounded"
                           onLoad={() => { URL.revokeObjectURL(file.preview) }}
+                          unoptimized={true}
                         />
                       ) : (
                         <div className="text-gray-500 text-xs uppercase">{file.name.split('.').pop()}</div>
@@ -389,7 +393,7 @@ export default function QRCodeGenerator() {
                       Share this link or QR code to provide access to your file.
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Note: Files are stored in your browser's localStorage. 
+                      Note: Files are stored in your browser&apos;s localStorage. 
                       They will persist between sessions but are limited by storage space 
                       and only accessible on this device.
                     </p>
