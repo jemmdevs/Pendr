@@ -166,13 +166,40 @@ export default function Home() {
                   <FileText size={32} />
                 </div>
                 <h3 className="text-xl font-semibold text-[#2D3748] group-hover:text-[#FF8C42] transition-colors mb-3">
-                  Generador de Facturas
+                  Invoice Generator
                 </h3>
                 <p className="text-gray-600 flex-grow">
-                  Crea, personaliza y descarga facturas profesionales. Guarda plantillas para uso futuro.
+                  Create, customize and download professional invoices. Save templates for future use.
                 </p>
                 <div className="flex items-center mt-6 text-[#3B82F6] font-medium">
-                  Pruébalo ahora
+                  Try it now
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+            
+            {/* QR Code Generator Module */}
+            <Link href="/qr-generator" className="group">
+              <div className="bg-[#F9FAFB] rounded-lg border border-[#E2E8F0] p-8 hover:shadow-md transition-all h-full flex flex-col">
+                <div className="bg-[#60A5FA] p-4 rounded-xl w-16 h-16 flex items-center justify-center text-white mb-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <rect x="7" y="7" width="3" height="3"></rect>
+                    <rect x="14" y="7" width="3" height="3"></rect>
+                    <rect x="7" y="14" width="3" height="3"></rect>
+                    <rect x="14" y="14" width="3" height="3"></rect>
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-[#2D3748] group-hover:text-[#FF8C42] transition-colors mb-3">
+                  QR Code Generator <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full ml-2">Beta</span>
+                </h3>
+                <p className="text-gray-600 flex-grow">
+                  Generate QR codes and links for your files. Share documents, images, and more easily.
+                </p>
+                <div className="flex items-center mt-6 text-[#3B82F6] font-medium">
+                  Try it now
                   <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -222,6 +249,18 @@ export default function Home() {
               className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
             >
               Try Calculator
+            </Link>
+            <Link 
+              href="/invoice-generator" 
+              className="bg-[#E67E22] hover:bg-[#D35400] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+            >
+              Try Invoice Generator
+            </Link>
+            <Link 
+              href="/qr-generator" 
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-8 py-4 rounded-md font-medium transition-colors shadow-sm inline-block"
+            >
+              Try QR Generator <span className="text-xs bg-white text-blue-800 px-2 py-0.5 rounded-full ml-1">Beta</span>
             </Link>
             <Link 
               href="/password-checker" 
