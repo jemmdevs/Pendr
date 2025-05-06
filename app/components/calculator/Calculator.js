@@ -70,8 +70,52 @@ export default function Calculator() {
     area: ['mm2', 'cm2', 'm2', 'km2', 'inch2', 'feet2', 'acre'],
   };
   
+  // Referencia para evitar bucles infinitos
+  const isFirstRender = React.useRef(true);
+  const prevMode = React.useRef(mode);
+  const prevFromCurrency = React.useRef(fromCurrency);
+  
+  // Función para convertir moneda (sin actualizar estado directamente)
+  const calculateConversion = (amount, from, to, rates) => {
+    if (!amount || isNaN(amount) || !rates || Object.keys(rates).length === 0) {
+      return '';
+    }
+    
+    const numAmount = parseFloat(amount);
+    
+    if (from === to) {
+      return numAmount.toFixed(2);
+    }
+    
+    if (rates[to]) {
+      const result = numAmount * rates[to];
+      return result.toFixed(2);
+    } else {
+      return 'N/A';
+    }
+  };
+
   // Efecto para cargar tipos de cambio cuando se selecciona el modo de moneda
   useEffect(() => {
+    // Evitar ejecución en el primer renderizado
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      prevMode.current = mode;
+      prevFromCurrency.current = fromCurrency;
+      return;
+    }
+    
+    // Solo proceder si cambió el modo a currency o cambió la moneda de origen
+    if (mode !== 'currency' || 
+        (prevMode.current === mode && prevFromCurrency.current === fromCurrency)) {
+      prevMode.current = mode;
+      prevFromCurrency.current = fromCurrency;
+      return;
+    }
+    
+    prevMode.current = mode;
+    prevFromCurrency.current = fromCurrency;
+    
     // Función para obtener tipos de cambio
     const fetchExchangeRates = async () => {
       if (!fromCurrency) return;
@@ -84,14 +128,18 @@ export default function Calculator() {
         const response = await axios.get(`https://open.er-api.com/v6/latest/${fromCurrency}`);
         
         if (response.data && response.data.rates) {
-          setExchangeRates(response.data.rates);
+          const rates = response.data.rates;
+          setExchangeRates(rates);
           
           // Extraer las monedas disponibles
-          const availableCurrencies = Object.keys(response.data.rates);
+          const availableCurrencies = Object.keys(rates);
           setCurrencies(availableCurrencies);
           
-          // Convertir el monto actual
-          convertCurrency(currencyAmount, fromCurrency, toCurrency, response.data.rates);
+          // Actualizar el monto convertido en una sola operación de estado
+          if (currencyAmount && toCurrency) {
+            const converted = calculateConversion(currencyAmount, fromCurrency, toCurrency, rates);
+            setConvertedAmount(converted);
+          }
         }
       } catch (error) {
         console.error('Error fetching exchange rates:', error);
@@ -101,37 +149,31 @@ export default function Calculator() {
       }
     };
 
+    // Solo ejecutar si estamos en modo moneda
     if (mode === 'currency') {
       fetchExchangeRates();
     }
-  }, [mode, fromCurrency, toCurrency, currencyAmount, convertCurrency]);
+  }, [mode, fromCurrency]); // Solo depende del modo y la moneda de origen
   
-  // Función para convertir moneda
-  const convertCurrency = (amount, from, to, rates = exchangeRates) => {
-    if (!amount || isNaN(amount) || !rates || Object.keys(rates).length === 0) {
-      setConvertedAmount('');
-      return;
-    }
+  // Efecto para actualizar la conversión cuando cambian los valores relevantes
+  useEffect(() => {
+    // Evitar ejecución en el primer renderizado
+    if (isFirstRender.current) return;
     
-    const numAmount = parseFloat(amount);
+    // Solo proceder si estamos en modo moneda, hay tipos de cambio y no estamos cargando
+    if (mode !== 'currency' || 
+        Object.keys(exchangeRates).length === 0 || 
+        isLoadingRates) return;
     
-    if (from === to) {
-      setConvertedAmount(numAmount.toFixed(2));
-      return;
-    }
-    
-    if (rates[to]) {
-      const result = numAmount * rates[to];
-      setConvertedAmount(result.toFixed(2));
-    } else {
-      setConvertedAmount('N/A');
-    }
-  };
+    // Calcular y actualizar el monto convertido
+    const converted = calculateConversion(currencyAmount, fromCurrency, toCurrency, exchangeRates);
+    setConvertedAmount(converted);
+  }, [mode, currencyAmount, toCurrency, exchangeRates, isLoadingRates]);
   
   // Manejadores para la conversión de monedas
   const handleCurrencyAmountChange = (value) => {
     setCurrencyAmount(value);
-    convertCurrency(value, fromCurrency, toCurrency);
+    // La conversión se maneja automáticamente en el useEffect
   };
   
   const handleFromCurrencyChange = (currency) => {
@@ -141,7 +183,7 @@ export default function Calculator() {
   
   const handleToCurrencyChange = (currency) => {
     setToCurrency(currency);
-    convertCurrency(currencyAmount, fromCurrency, currency);
+    // La conversión se maneja automáticamente en el useEffect
   };
   
   const switchCurrencies = () => {
