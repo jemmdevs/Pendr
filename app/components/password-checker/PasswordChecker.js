@@ -32,103 +32,103 @@ export default function PasswordChecker() {
     'superman', 'trustno1', 'sunshine', 'iloveyou', 'princess'
   ];
   
-  // Función para evaluar la seguridad de la contraseña
-  const evaluatePassword = (pass) => {
-    if (!pass) {
-      setStrength(0);
-      setFeedback([]);
-      setSuggestions([]);
-      return;
-    }
-    
-    // Verificar criterios
-    const meetsLength = pass.length >= 8;
-    const meetsUppercase = /[A-Z]/.test(pass);
-    const meetsLowercase = /[a-z]/.test(pass);
-    const meetsNumbers = /[0-9]/.test(pass);
-    const meetsSpecial = /[^A-Za-z0-9]/.test(pass);
-    const isCommon = commonPasswords.includes(pass.toLowerCase());
-    
-    // Actualizar estado de los criterios
-    const updatedCriteria = [
-      { id: 'length', label: 'At least 8 characters', met: meetsLength },
-      { id: 'uppercase', label: 'Contains uppercase letters', met: meetsUppercase },
-      { id: 'lowercase', label: 'Contains lowercase letters', met: meetsLowercase },
-      { id: 'numbers', label: 'Contains numbers', met: meetsNumbers },
-      { id: 'special', label: 'Contains special characters', met: meetsSpecial },
-      { id: 'noCommon', label: 'Not a common password', met: !isCommon },
-    ];
-    
-    // Calcular puntuación
-    let score = 0;
-    if (meetsLength) score += 20;
-    if (meetsUppercase) score += 15;
-    if (meetsLowercase) score += 15;
-    if (meetsNumbers) score += 15;
-    if (meetsSpecial) score += 20;
-    if (!isCommon) score += 15;
-    
-    // Penalización por contraseñas cortas
-    if (pass.length < 6) score = Math.max(score - 20, 0);
-    
-    // Bonificación por longitud extra
-    if (pass.length > 12) score = Math.min(score + 10, 100);
-    if (pass.length > 16) score = Math.min(score + 10, 100);
-    
-    // Penalización por patrones repetitivos
-    if (/(.+)\1{2,}/.test(pass)) score = Math.max(score - 15, 0);
-    
-    // Penalización por secuencias comunes
-    if (/(?:abc|bcd|cde|def|efg|123|234|345|456|567|678|789)/.test(pass.toLowerCase())) {
-      score = Math.max(score - 10, 0);
-    }
-    
-    // Generar feedback
-    const newFeedback = [];
-    const newSuggestions = [];
-    
-    if (score < 50) {
-      newFeedback.push('Your password is weak');
-    } else if (score < 80) {
-      newFeedback.push('Your password is moderate');
-    } else {
-      newFeedback.push('Your password is strong');
-    }
-    
-    // Sugerencias basadas en criterios no cumplidos
-    if (!meetsLength) {
-      newSuggestions.push('Make your password longer (at least 8 characters)');
-    }
-    if (!meetsUppercase) {
-      newSuggestions.push('Add uppercase letters (A-Z)');
-    }
-    if (!meetsLowercase) {
-      newSuggestions.push('Add lowercase letters (a-z)');
-    }
-    if (!meetsNumbers) {
-      newSuggestions.push('Add numbers (0-9)');
-    }
-    if (!meetsSpecial) {
-      newSuggestions.push('Add special characters (!@#$%^&*)');
-    }
-    if (isCommon) {
-      newSuggestions.push('Avoid common passwords');
-    }
-    if (/(.+)\1{2,}/.test(pass)) {
-      newSuggestions.push('Avoid repeating patterns');
-    }
-    if (/(?:abc|bcd|cde|def|efg|123|234|345|456|567|678|789)/.test(pass.toLowerCase())) {
-      newSuggestions.push('Avoid sequential characters');
-    }
-    
-    setStrength(score);
-    setFeedback(newFeedback);
-    setSuggestions(newSuggestions);
-  };
-
   useEffect(() => {
+    // Función para evaluar la seguridad de la contraseña
+    const evaluatePassword = (pass) => {
+      if (!pass) {
+        setStrength(0);
+        setFeedback([]);
+        setSuggestions([]);
+        return;
+      }
+      
+      // Verificar criterios
+      const meetsLength = pass.length >= 8;
+      const meetsUppercase = /[A-Z]/.test(pass);
+      const meetsLowercase = /[a-z]/.test(pass);
+      const meetsNumbers = /[0-9]/.test(pass);
+      const meetsSpecial = /[^A-Za-z0-9]/.test(pass);
+      const isCommon = commonPasswords.includes(pass.toLowerCase());
+      
+      // Actualizar estado de los criterios
+      const updatedCriteria = [
+        { id: 'length', label: 'At least 8 characters', met: meetsLength },
+        { id: 'uppercase', label: 'Contains uppercase letters', met: meetsUppercase },
+        { id: 'lowercase', label: 'Contains lowercase letters', met: meetsLowercase },
+        { id: 'numbers', label: 'Contains numbers', met: meetsNumbers },
+        { id: 'special', label: 'Contains special characters', met: meetsSpecial },
+        { id: 'noCommon', label: 'Not a common password', met: !isCommon },
+      ];
+      
+      // Calcular puntuación
+      let score = 0;
+      if (meetsLength) score += 20;
+      if (meetsUppercase) score += 15;
+      if (meetsLowercase) score += 15;
+      if (meetsNumbers) score += 15;
+      if (meetsSpecial) score += 20;
+      if (!isCommon) score += 15;
+      
+      // Penalización por contraseñas cortas
+      if (pass.length < 6) score = Math.max(score - 20, 0);
+      
+      // Bonificación por longitud extra
+      if (pass.length > 12) score = Math.min(score + 10, 100);
+      if (pass.length > 16) score = Math.min(score + 10, 100);
+      
+      // Penalización por patrones repetitivos
+      if (/(.+)\1{2,}/.test(pass)) score = Math.max(score - 15, 0);
+      
+      // Penalización por secuencias comunes
+      if (/(?:abc|bcd|cde|def|efg|123|234|345|456|567|678|789)/.test(pass.toLowerCase())) {
+        score = Math.max(score - 10, 0);
+      }
+      
+      // Generar feedback
+      const newFeedback = [];
+      const newSuggestions = [];
+      
+      if (score < 50) {
+        newFeedback.push('Your password is weak');
+      } else if (score < 80) {
+        newFeedback.push('Your password is moderate');
+      } else {
+        newFeedback.push('Your password is strong');
+      }
+      
+      // Sugerencias basadas en criterios no cumplidos
+      if (!meetsLength) {
+        newSuggestions.push('Make your password longer (at least 8 characters)');
+      }
+      if (!meetsUppercase) {
+        newSuggestions.push('Add uppercase letters (A-Z)');
+      }
+      if (!meetsLowercase) {
+        newSuggestions.push('Add lowercase letters (a-z)');
+      }
+      if (!meetsNumbers) {
+        newSuggestions.push('Add numbers (0-9)');
+      }
+      if (!meetsSpecial) {
+        newSuggestions.push('Add special characters (!@#$%^&*)');
+      }
+      if (isCommon) {
+        newSuggestions.push('Avoid common passwords');
+      }
+      if (/(.+)\1{2,}/.test(pass)) {
+        newSuggestions.push('Avoid repeating patterns');
+      }
+      if (/(?:abc|bcd|cde|def|efg|123|234|345|456|567|678|789)/.test(pass.toLowerCase())) {
+        newSuggestions.push('Avoid sequential characters');
+      }
+      
+      setStrength(score);
+      setFeedback(newFeedback);
+      setSuggestions(newSuggestions);
+    };
+
     evaluatePassword(password);
-  }, [password]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [password, commonPasswords]);
   
   // Función para guardar la contraseña en el historial
   const savePassword = () => {

@@ -70,41 +70,41 @@ export default function Calculator() {
     area: ['mm2', 'cm2', 'm2', 'km2', 'inch2', 'feet2', 'acre'],
   };
   
-  // Función para obtener tipos de cambio
-  const fetchExchangeRates = async () => {
-    if (!fromCurrency) return;
-    
-    setIsLoadingRates(true);
-    setCurrencyError('');
-    
-    try {
-      // Usando la API gratuita de ExchangeRate-API
-      const response = await axios.get(`https://open.er-api.com/v6/latest/${fromCurrency}`);
-      
-      if (response.data && response.data.rates) {
-        setExchangeRates(response.data.rates);
-        
-        // Extraer las monedas disponibles
-        const availableCurrencies = Object.keys(response.data.rates);
-        setCurrencies(availableCurrencies);
-        
-        // Convertir el monto actual
-        convertCurrency(currencyAmount, fromCurrency, toCurrency, response.data.rates);
-      }
-    } catch (error) {
-      console.error('Error fetching exchange rates:', error);
-      setCurrencyError('Error al obtener tipos de cambio. Por favor, inténtelo de nuevo más tarde.');
-    } finally {
-      setIsLoadingRates(false);
-    }
-  };
-
   // Efecto para cargar tipos de cambio cuando se selecciona el modo de moneda
   useEffect(() => {
+    // Función para obtener tipos de cambio
+    const fetchExchangeRates = async () => {
+      if (!fromCurrency) return;
+      
+      setIsLoadingRates(true);
+      setCurrencyError('');
+      
+      try {
+        // Usando la API gratuita de ExchangeRate-API
+        const response = await axios.get(`https://open.er-api.com/v6/latest/${fromCurrency}`);
+        
+        if (response.data && response.data.rates) {
+          setExchangeRates(response.data.rates);
+          
+          // Extraer las monedas disponibles
+          const availableCurrencies = Object.keys(response.data.rates);
+          setCurrencies(availableCurrencies);
+          
+          // Convertir el monto actual
+          convertCurrency(currencyAmount, fromCurrency, toCurrency, response.data.rates);
+        }
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+        setCurrencyError('Error al obtener tipos de cambio. Por favor, inténtelo de nuevo más tarde.');
+      } finally {
+        setIsLoadingRates(false);
+      }
+    };
+
     if (mode === 'currency') {
       fetchExchangeRates();
     }
-  }, [mode, fromCurrency]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mode, fromCurrency, toCurrency, currencyAmount, convertCurrency]);
   
   // Función para convertir moneda
   const convertCurrency = (amount, from, to, rates = exchangeRates) => {
